@@ -1,0 +1,6 @@
+{
+  "name": "OBSIDIA TOOLS",
+  "description": "Android Game Graphics Controller & Device Performance Monitor with premium dark obsidian aesthetic",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

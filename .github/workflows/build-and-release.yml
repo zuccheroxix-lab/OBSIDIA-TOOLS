@@ -1,0 +1,80 @@
+name: Obsidia Tools Android CI & Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Test Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew if present
+        run: chmod +x gradlew || true
+
+      - name: Run Unit Tests
+        run: gradle :app:testDebugUnitTest
+
+      - name: Build Debug APK
+        run: gradle :app:assembleDebug
+
+      - name: Build Release APK
+        run: gradle :app:assembleRelease
+        env:
+          KEYSTORE_PATH: ""
+          STORE_PASSWORD: ""
+          KEY_PASSWORD: ""
+
+      - name: Locate & Verify APK Outputs
+        id: apk-locate
+        run: |
+          mkdir -p build-artifacts
+          if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk build-artifacts/ObsidiaTools-v1.0.0-debug.apk
+            sha256sum build-artifacts/ObsidiaTools-v1.0.0-debug.apk > build-artifacts/ObsidiaTools-v1.0.0-debug.apk.sha256
+          fi
+          if [ -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            cp app/build/outputs/apk/release/app-release-unsigned.apk build-artifacts/ObsidiaTools-v1.0.0.apk
+            sha256sum build-artifacts/ObsidiaTools-v1.0.0.apk > build-artifacts/ObsidiaTools-v1.0.0.apk.sha256
+          elif [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            cp app/build/outputs/apk/release/app-release.apk build-artifacts/ObsidiaTools-v1.0.0.apk
+            sha256sum build-artifacts/ObsidiaTools-v1.0.0.apk > build-artifacts/ObsidiaTools-v1.0.0.apk.sha256
+          fi
+          echo "Generated Artifacts:"
+          ls -la build-artifacts/
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidia-tools-apk
+          path: build-artifacts/
+
+      - name: Create GitHub Release on Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build-artifacts/*.apk
+            build-artifacts/*.sha256
+          draft: false
+          prerelease: false
+          generate_release_notes: true
