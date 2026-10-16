@@ -39,6 +39,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,9 +79,10 @@ fun ReleaseDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = LocalContext.current
-    val repoUrl = "https://github.com/candrajouva03/OBSIDIA-TOOLS"
-    val releasesUrl = "https://github.com/candrajouva03/OBSIDIA-TOOLS/releases"
-    val sampleSha256 = "7c58d9b45086b2daff9efd183c36e367ca26e1f3a12537d169f549c7cdbb711b"
+    var ownerRepo by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("candrajouva03/OBSIDIA-TOOLS") }
+    val repoUrl = "https://github.com/${ownerRepo.trim()}"
+    val releasesUrl = "https://github.com/${ownerRepo.trim()}/releases"
+    val sampleSha256 = "5674d5beb0fbe082bbc1724dd44955cfc8e315f2f6d8f8b7948e2a375c8fe8bf"
 
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,

@@ -37,12 +37,17 @@ jobs:
       - name: Build Debug APK
         run: gradle :app:assembleDebug
 
+      - name: Ensure Release Signing Keystore
+        run: |
+          if [ ! -f "my-upload-key.jks" ]; then
+            keytool -genkeypair -v -keystore my-upload-key.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Obsidia, OU=Tools, O=Zucchero, L=Jakarta, ST=Jakarta, C=ID"
+          fi
+
       - name: Build Release APK
         run: gradle :app:assembleRelease
         env:
-          KEYSTORE_PATH: ""
-          STORE_PASSWORD: ""
-          KEY_PASSWORD: ""
+          STORE_PASSWORD: "android"
+          KEY_PASSWORD: "android"
 
       - name: Locate & Verify APK Outputs
         id: apk-locate

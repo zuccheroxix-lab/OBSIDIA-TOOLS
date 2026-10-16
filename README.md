@@ -89,10 +89,19 @@ Output APK: `app/build/outputs/apk/release/app-release.apk`
 
 ## 📦 GitHub Release & Download
 
-- **Repository**: [https://github.com/candrajouva03/OBSIDIA-TOOLS](https://github.com/candrajouva03/OBSIDIA-TOOLS)
-- **Releases**: [https://github.com/candrajouva03/OBSIDIA-TOOLS/releases](https://github.com/candrajouva03/OBSIDIA-TOOLS/releases)
-- **SHA-256 Checksum (Release APK)**: `7c58d9b45086b2daff9efd183c36e367ca26e1f3a12537d169f549c7cdbb711b`
-- **SHA-256 Checksum (Debug APK)**: `98572c4c34b24646d5e03f9e3dc34b762f17302b85c31db90ca2c2981b93356e`
+- **Repository**: `https://github.com/<USERNAME>/OBSIDIA-TOOLS` (Ganti `<USERNAME>` dengan username GitHub akun Anda)
+- **Halaman Releases**: `https://github.com/<USERNAME>/OBSIDIA-TOOLS/releases`
+- **Asset Release Otomatis**: Tag rilis `v*` (contoh: `v1.0.1`) secara otomatis menjalankan GitHub Actions CI untuk mempublikasikan binary APK ke GitHub Releases.
+
+### 🔐 Akses Unduhan Publik vs Privat
+- **Repositori Privat**: Asset rilis memerlukan login akun GitHub yang memiliki akses kolaborator.
+- **Distribusi Publik Bebas Login**: Jika ingin membagikan APK ke pengguna luas tanpa login, ubah visibilitas repositori menjadi **Public** pada tab *Settings > Change repository visibility* di GitHub, atau publikasikan rilis APK ke repositori rilis publik.
+
+### 📋 Verifikasi Binary APK Lokal
+| Tipe Build | Lokasi File APK Nyata | Ukuran | SHA-256 Checksum |
+| :--- | :--- | :--- | :--- |
+| **Release APK** | `app/build/outputs/apk/release/app-release.apk` | 19 MB | `5674d5beb0fbe082bbc1724dd44955cfc8e315f2f6d8f8b7948e2a375c8fe8bf` |
+| **Debug APK** | `app/build/outputs/apk/debug/app-debug.apk` | 25 MB | `c9753cc89c517087913fffe4869e6b042a22b5b15bfe32cb3015349af4f26f47` |
 
 ---
 
