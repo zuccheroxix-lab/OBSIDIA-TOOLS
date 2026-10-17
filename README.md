@@ -100,8 +100,8 @@ Output APK: `app/build/outputs/apk/release/app-release.apk`
 ### 📋 Verifikasi Binary APK Lokal
 | Tipe Build | Lokasi File APK Nyata | Ukuran | SHA-256 Checksum |
 | :--- | :--- | :--- | :--- |
-| **Release APK** | `app/build/outputs/apk/release/app-release.apk` | 19 MB | `5674d5beb0fbe082bbc1724dd44955cfc8e315f2f6d8f8b7948e2a375c8fe8bf` |
-| **Debug APK** | `app/build/outputs/apk/debug/app-debug.apk` | 25 MB | `c9753cc89c517087913fffe4869e6b042a22b5b15bfe32cb3015349af4f26f47` |
+| **Release APK** | `app/build/outputs/apk/release/app-release.apk` | 19 MB | `2f2a8fe90a8401bdbb0b246471b8f0954d7f002a1a6d9f45e0a8ef3914f19f52` |
+| **Debug APK** | `app/build/outputs/apk/debug/app-debug.apk` | 26 MB | `ffaee2604f16a9b303830da2558cdc5e24982a236395e808be32b675e554693c` |
 
 ---
 

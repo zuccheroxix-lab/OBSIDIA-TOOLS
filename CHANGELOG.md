@@ -2,6 +2,14 @@
 
 All notable changes to **OBSIDIA TOOLS** will be documented in this file.
 
+## [1.0.1] - 2026-10-17
+
+### Fixed
+- **GitHub Actions CI/CD Stability**: Configured `gradle/actions/setup-gradle@v4` on the Ubuntu runner and isolated workflow triggers to version tags (`v*`) and manual dispatch to completely stop continuous email spam on routine commits.
+- **CI Keystore Provisioning**: Automated keystore generation in GitHub Actions workflow so release APK assembly never fails on missing keystores.
+- **Dynamic Repository URLs**: Removed hardcoded username assumptions; added dynamic repository path input in the app to prevent 404 links across different GitHub accounts.
+- **Transparent Public Distribution**: Clarified private versus public repository download permissions and verified artifact integrity.
+
 ## [1.0.0] - 2026-10-16
 
 ### Added

@@ -195,7 +195,7 @@ fun SettingsScreen(
             SettingsRowCard(
                 icon = Icons.Outlined.Info,
                 title = if (isIndo) "Tentang Aplikasi" else "About App",
-                valueText = "v1.0.0",
+                valueText = "v1.0.1",
                 onClick = { showAboutDialog = true },
                 testTag = "settings_about_row"
             )
@@ -338,7 +338,7 @@ fun SettingsScreen(
             text = {
                 Column {
                     Text(
-                        text = "OBSIDIA TOOLS v1.0.0",
+                        text = "OBSIDIA TOOLS v1.0.1",
                         color = CrimsonRed,
                         fontWeight = FontWeight.Black,
                         fontSize = 16.sp

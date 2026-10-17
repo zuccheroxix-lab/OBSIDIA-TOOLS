@@ -82,7 +82,7 @@ fun ReleaseDialog(
     var ownerRepo by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("candrajouva03/OBSIDIA-TOOLS") }
     val repoUrl = "https://github.com/${ownerRepo.trim()}"
     val releasesUrl = "https://github.com/${ownerRepo.trim()}/releases"
-    val sampleSha256 = "5674d5beb0fbe082bbc1724dd44955cfc8e315f2f6d8f8b7948e2a375c8fe8bf"
+    val sampleSha256 = "2f2a8fe90a8401bdbb0b246471b8f0954d7f002a1a6d9f45e0a8ef3914f19f52"
 
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
@@ -128,51 +128,77 @@ fun ReleaseDialog(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // GitHub Card
+                // GitHub Card & Repository Target
                 ObsidiaCard(
                     modifier = Modifier.fillMaxWidth(),
                     borderColor = ObsidianBorder
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .background(ObsidianCardElevated, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Lock,
-                                    contentDescription = null,
-                                    tint = MetallicSilver,
-                                    modifier = Modifier.size(18.dp)
-                                )
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(ObsidianCardElevated, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Lock,
+                                        contentDescription = null,
+                                        tint = MetallicSilver,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = "GitHub Target",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextPrimary
+                                    )
+                                    Text(
+                                        text = "Repository: $ownerRepo",
+                                        fontSize = 11.sp,
+                                        color = TextSecondary
+                                    )
+                                }
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
-                                Text(
-                                    text = "GitHub",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
-                                )
-                                Text(
-                                    text = "Private Repository",
-                                    fontSize = 11.sp,
-                                    color = TextSecondary
-                                )
-                            }
+
+                            StatusBadge(
+                                text = "Release v1.0.1",
+                                color = EmeraldSuccess,
+                                bgColor = EmeraldSuccessBg
+                            )
                         }
 
-                        StatusBadge(
-                            text = "Private",
-                            color = MetallicSilver,
-                            bgColor = ObsidianCardElevated
-                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Editable repo field
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(ObsidianCardElevated)
+                                .border(1.dp, ObsidianBorder, RoundedCornerShape(8.dp))
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            androidx.compose.foundation.text.BasicTextField(
+                                value = ownerRepo,
+                                onValueChange = { ownerRepo = it },
+                                textStyle = androidx.compose.ui.text.TextStyle(
+                                    color = TextPrimary,
+                                    fontSize = 12.sp,
+                                    fontFamily = FontFamily.Monospace
+                                ),
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true
+                            )
+                        }
                     }
                 }
 
@@ -190,20 +216,20 @@ fun ReleaseDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "v1.0.0",
+                                text = "v1.0.1",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Black,
                                 color = TextPrimary
                             )
                             StatusBadge(
-                                text = "Latest",
+                                text = "Verified Build",
                                 color = EmeraldSuccess,
                                 bgColor = EmeraldSuccessBg
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Build APK • Bug Fixes • Performance",
+                            text = "Release APK • Non-Root • Signed & Verified (19 MB)",
                             fontSize = 12.sp,
                             color = TextSecondary
                         )
@@ -211,7 +237,7 @@ fun ReleaseDialog(
 
                         // Download APK Button
                         ObsidiaCrimsonButton(
-                            text = "Download APK",
+                            text = "Download APK / Buka Releases",
                             onClick = {
                                 try {
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(releasesUrl))

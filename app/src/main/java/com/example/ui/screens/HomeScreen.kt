@@ -126,7 +126,7 @@ fun HomeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "v1.0.0",
+                        text = "v1.0.1",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = MetallicSilver
