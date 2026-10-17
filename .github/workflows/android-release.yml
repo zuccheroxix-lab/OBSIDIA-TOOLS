@@ -1,0 +1,154 @@
+name: Android Release Build & Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag version (e.g. v1.0.1)'
+        required: false
+        default: 'v1.0.1'
+        type: string
+      create_release:
+        description: 'Publish as GitHub Release with APK assets'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build APK & Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Ensure Executable Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Run Project Unit Tests
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Provision Release Signing Keystore
+        run: |
+          if [ ! -f "my-upload-key.jks" ]; then
+            echo "Generating build upload keystore for CI release packaging..."
+            keytool -genkeypair -v -keystore my-upload-key.jks \
+              -alias upload \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass android \
+              -keypass android \
+              -dname "CN=Obsidia, OU=Tools, O=Zucchero, L=Jakarta, ST=Jakarta, C=ID"
+          fi
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon
+        env:
+          STORE_PASSWORD: "android"
+          KEY_PASSWORD: "android"
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Validate & Prepare Release Assets
+        id: prepare-assets
+        run: |
+          set -e
+          RELEASE_APK="app/build/outputs/apk/release/app-release.apk"
+          DEBUG_APK="app/build/outputs/apk/debug/app-debug.apk"
+
+          if [ ! -f "$RELEASE_APK" ]; then
+            echo "::error::Release APK not found at $RELEASE_APK!"
+            exit 1
+          fi
+
+          FILE_SIZE=$(stat -c%s "$RELEASE_APK" 2>/dev/null || stat -f%z "$RELEASE_APK")
+          if [ "$FILE_SIZE" -le 1000000 ]; then
+            echo "::error::Release APK file size is abnormally small ($FILE_SIZE bytes)!"
+            exit 1
+          fi
+
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="${{ inputs.tag_name || 'v1.0.1' }}"
+          fi
+
+          mkdir -p release-assets
+          cp "$RELEASE_APK" "release-assets/ObsidiaTools-${TAG}.apk"
+          cp "$DEBUG_APK" "release-assets/ObsidiaTools-${TAG}-debug.apk"
+
+          cd release-assets
+          sha256sum "ObsidiaTools-${TAG}.apk" > "ObsidiaTools-${TAG}.apk.sha256"
+          sha256sum "ObsidiaTools-${TAG}-debug.apk" > "ObsidiaTools-${TAG}-debug.apk.sha256"
+          RELEASE_SHA=$(cat "ObsidiaTools-${TAG}.apk.sha256" | awk '{print $1}')
+          cd ..
+
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "release_sha=${RELEASE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "file_size_mb=$(echo "$FILE_SIZE / 1048576" | bc 2>/dev/null || echo "$((FILE_SIZE / 1048576))")MB" >> "$GITHUB_OUTPUT"
+
+          echo "=========================================="
+          echo "RELEASE ASSET VALIDATION SUCCEEDED:"
+          echo "Tag: ${TAG}"
+          echo "Release APK: release-assets/ObsidiaTools-${TAG}.apk (${FILE_SIZE} bytes)"
+          echo "Release SHA-256: ${RELEASE_SHA}"
+          echo "=========================================="
+
+      - name: Upload GitHub Actions Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidia-tools-${{ steps.prepare-assets.outputs.tag_name }}-apks
+          path: release-assets/
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && (inputs.create_release == true || inputs.create_release == 'true'))
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.prepare-assets.outputs.tag_name }}
+          name: OBSIDIA TOOLS ${{ steps.prepare-assets.outputs.tag_name }}
+          files: |
+            release-assets/*.apk
+            release-assets/*.sha256
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## 🎮 OBSIDIA TOOLS ${{ steps.prepare-assets.outputs.tag_name }}
+            
+            Android Game Graphics Controller & Device Performance Monitor with premium dark obsidian aesthetic.
+
+            ### 📦 Download Assets
+            - **Release APK**: `ObsidiaTools-${{ steps.prepare-assets.outputs.tag_name }}.apk` (${{ steps.prepare-assets.outputs.file_size_mb }})
+            - **Debug APK**: `ObsidiaTools-${{ steps.prepare-assets.outputs.tag_name }}-debug.apk`
+            - **SHA-256 Checksum**:
+              ```
+              ${{ steps.prepare-assets.outputs.release_sha }}
+              ```
+
+            ### 🛡️ Verified & Secure
+            - Application ID: `com.aistudio.obsidiatools.k8z4p`
+            - 100% Non-Root standard Android APIs
+            - Built automatically from source code by GitHub Actions CI/CD.
