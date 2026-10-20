@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.ui.components.ObsidiaCard
 import com.example.ui.components.ObsidiaCrimsonButton
+import com.example.ui.components.ObsidiaOutlinedBtn
 import com.example.ui.components.StatusBadge
 import com.example.ui.theme.BurgundyDeep
 import com.example.ui.theme.CrimsonRed
@@ -79,10 +80,13 @@ fun ReleaseDialog(
     onDismissRequest: () -> Unit
 ) {
     val context = LocalContext.current
-    var ownerRepo by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("candrajouva03/OBSIDIA-TOOLS") }
+    var ownerRepo by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("zuccheroxix-lab/OBSIDIA-TOOLS") }
     val repoUrl = "https://github.com/${ownerRepo.trim()}"
     val releasesUrl = "https://github.com/${ownerRepo.trim()}/releases"
-    val sampleSha256 = "2f2a8fe90a8401bdbb0b246471b8f0954d7f002a1a6d9f45e0a8ef3914f19f52"
+    val releaseDownloadUrl = "https://github.com/${ownerRepo.trim()}/releases/download/v1.0.1/ObsidiaTools-v1.0.1.apk"
+    val debugDownloadUrl = "https://github.com/${ownerRepo.trim()}/releases/download/v1.0.1/ObsidiaTools-v1.0.1-debug.apk"
+    val releaseSha256 = "3121219bcc78389834e9eb20f18b897c35eb88c13dc8a8f74c138a1538aa0a96"
+    val debugSha256 = "19e6291e418cf1829848b107e9c4bbeac37d05211f58a879e0b14084aa6d9511"
 
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
@@ -216,39 +220,67 @@ fun ReleaseDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "v1.0.1",
+                                text = "v1.0.1 Production",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Black,
                                 color = TextPrimary
                             )
                             StatusBadge(
-                                text = "Verified Build",
+                                text = "Build Success",
                                 color = EmeraldSuccess,
                                 bgColor = EmeraldSuccessBg
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Release APK • Non-Root • Signed & Verified (19 MB)",
+                            text = "Release (19 MB) • Debug (25 MB) • Signed & Verified",
                             fontSize = 12.sp,
                             color = TextSecondary
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // Download APK Button
+                        // DOWNLOAD RELEASE APK Button
                         ObsidiaCrimsonButton(
-                            text = "Download APK / Buka Releases",
+                            text = "DOWNLOAD RELEASE APK",
                             onClick = {
                                 try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(releasesUrl))
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(releaseDownloadUrl))
                                     context.startActivity(intent)
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "Buka: $releasesUrl", Toast.LENGTH_LONG).show()
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(releasesUrl))
+                                        context.startActivity(intent)
+                                    } catch (ex: Exception) {
+                                        Toast.makeText(context, "Buka: $releasesUrl", Toast.LENGTH_LONG).show()
+                                    }
                                 }
                             },
                             icon = Icons.Default.Download,
                             modifier = Modifier.fillMaxWidth(),
-                            testTag = "release_download_btn"
+                            testTag = "download_release_apk_btn"
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // DOWNLOAD DEBUG APK Button
+                        ObsidiaOutlinedBtn(
+                            text = "DOWNLOAD DEBUG APK",
+                            onClick = {
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(debugDownloadUrl))
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(releasesUrl))
+                                        context.startActivity(intent)
+                                    } catch (ex: Exception) {
+                                        Toast.makeText(context, "Buka: $releasesUrl", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            },
+                            icon = Icons.Default.Download,
+                            modifier = Modifier.fillMaxWidth(),
+                            testTag = "download_debug_apk_btn"
                         )
                     }
                 }
@@ -257,7 +289,7 @@ fun ReleaseDialog(
 
                 // SHA-256 Checksum
                 Text(
-                    text = "SHA-256 Checksum",
+                    text = "Release APK SHA-256 Checksum",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TextSecondary
@@ -271,7 +303,7 @@ fun ReleaseDialog(
                         .border(1.dp, ObsidianBorder, RoundedCornerShape(10.dp))
                         .clickable {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            clipboard.setPrimaryClip(ClipData.newPlainText("SHA256", sampleSha256))
+                            clipboard.setPrimaryClip(ClipData.newPlainText("SHA256", releaseSha256))
                             Toast.makeText(context, "Checksum disalin ke clipboard!", Toast.LENGTH_SHORT).show()
                         }
                         .padding(10.dp)
@@ -282,7 +314,7 @@ fun ReleaseDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "${sampleSha256.take(24)}...",
+                            text = "${releaseSha256.take(24)}...",
                             fontSize = 12.sp,
                             fontFamily = FontFamily.Monospace,
                             color = CrimsonRed
